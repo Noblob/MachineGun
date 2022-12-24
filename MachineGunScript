@@ -1,0 +1,64 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MachineGunScript : MonoBehaviour
+{
+    public float damage = 1;
+    public float range = 1000f;
+    public Camera Cam;
+    public bool ReadyToShoot = false;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(Input.GetMouseButtonDown(0))
+        {
+            ReadyShoot();
+            ReadyToShoot = true;
+        }
+
+        if(Input.GetMouseButtonUp(0))
+        {
+            ReadyToShoot = false;
+        }
+
+    }
+
+    void ReadyShoot()
+    {
+        StartCoroutine(StartShooting());
+    }
+
+    IEnumerator StartShooting()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Shoot();
+        if(ReadyToShoot == true)
+        {
+            StartCoroutine(StartShooting());
+        }
+    }
+
+    void Shoot ()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(Cam.transform.position, Cam.transform.forward, out hit, range))
+        {
+            Debug.Log(hit.transform.name);
+
+            Target target = hit.transform.GetComponent<Target>();
+            if (target != null)
+            {
+                Debug.Log("Shot");
+                target.TakeDamage(damage);
+            }
+        }
+    }
+}
